@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
+    "@serwist/turbopack": "^9.5.12",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^7.0.1",
@@ -41,6 +42,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
+    "esbuild": "^0.28.2",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
     "eslint-config-prettier": "^10.1.8",
@@ -48,6 +50,7 @@
     "jest-environment-jsdom": "^30.4.1",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "serwist": "^9.5.12",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
