@@ -4,6 +4,7 @@ import './globals.css'
 import { cn } from '@/lib/utils'
 import { ThemeProvider } from '@/providers/theme-provider'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           {children}
         </ThemeProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
