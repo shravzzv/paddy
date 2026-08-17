@@ -22,5 +22,57 @@ export default function manifest(): MetadataRoute.Manifest {
         type: 'image/png',
       },
     ],
+    screenshots: [
+      {
+        src: '/screenshots/narrow-1.jpg',
+        form_factor: 'narrow',
+        sizes: '1080x1350',
+      },
+      {
+        src: '/screenshots/narrow-2.jpg',
+        form_factor: 'narrow',
+        sizes: '1080x1350',
+      },
+      {
+        src: '/screenshots/narrow-3.jpg',
+        form_factor: 'narrow',
+        sizes: '1080x1350',
+      },
+      {
+        src: '/screenshots/narrow-4.jpg',
+        form_factor: 'narrow',
+        sizes: '1080x1350',
+      },
+      {
+        src: '/screenshots/narrow-5.jpg',
+        form_factor: 'narrow',
+        sizes: '1080x1350',
+      },
+      {
+        src: '/screenshots/wide-1.jpg',
+        form_factor: 'wide',
+        sizes: '1920x1080',
+      },
+      {
+        src: '/screenshots/wide-2.jpg',
+        form_factor: 'wide',
+        sizes: '1920x1080',
+      },
+      {
+        src: '/screenshots/wide-3.jpg',
+        form_factor: 'wide',
+        sizes: '1920x1080',
+      },
+      {
+        src: '/screenshots/wide-4.jpg',
+        form_factor: 'wide',
+        sizes: '1920x1080',
+      },
+      {
+        src: '/screenshots/wide-5.jpg',
+        form_factor: 'wide',
+        sizes: '1920x1080',
+      },
+    ],
   }
 }
