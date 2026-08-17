@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Paddy
 
-## Getting Started
+> **Read beautifully.**
 
-First, run the development server:
+Paddy is an offline-first, cross-platform document reader for PDFs and EPUBs, designed around a simple idea:
+
+**Reading documents should feel beautiful, comfortable, personal, and effortless.**
+
+Paddy focuses on the reading experience rather than treating documents primarily as files to manage or edit. It aims to provide thoughtful typography, customizable themes, accessibility, performance, and interactions that make long-form reading feel good.
+
+## Status
+
+🚧 **Early development**
+
+Paddy is currently being built. The application, architecture, and design are expected to evolve substantially as the project progresses.
+
+## Vision
+
+Paddy aims to become a document reader I genuinely prefer to use every day.
+
+The project explores what happens when reading comfort is treated as a first-class product concern:
+
+- Calm, focused reading
+- Beautiful and comfortable typography
+- Meaningful customization
+- Offline-first functionality
+- Responsive, performant interactions
+- Accessibility as a core concern
+- Thoughtful feedback and interaction design
+- AI features where they genuinely improve reading
+
+## Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project philosophy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Paddy is being built with a particular emphasis on **how software feels**, not merely whether it functions.
 
-## Learn More
+> **What does it feel like to use this thing?**
 
-To learn more about Next.js, take a look at the following resources:
+Reading comfort comes before feature count. Beautiful defaults come before endless configuration. The document belongs to the user. Offline functionality should be a foundation, not an afterthought.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The project is also an opportunity to become a better builder by taking a complex product from idea through production.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
+This project is currently **not licensed for reuse**.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The source code is publicly visible for learning and transparency, but no permission is granted to copy, modify, redistribute, or use it in other projects.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Licensing may be revisited in the future as the project evolves.
