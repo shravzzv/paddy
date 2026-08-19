@@ -4,13 +4,15 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CircleAlert } from 'lucide-react'
 import { type RenderTask } from 'pdfjs-dist'
 import { useEffect, useRef, useState } from 'react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 const MAX_PAGE_WIDTH = 900
 
 export default function Page() {
+  const [isError, setIsError] = useState(false)
   const [pageCount, setPageCount] = useState(0)
   const [pageNumber, setPageNumber] = useState(1)
   const [isLoading, setIsLoading] = useState(false)
@@ -35,6 +37,7 @@ export default function Page() {
 
     const loadPdf = async () => {
       setIsLoading(true)
+      setIsError(false)
 
       try {
         const pdfjs = await import('pdfjs-dist')
@@ -95,7 +98,7 @@ export default function Page() {
           error instanceof Error &&
           error?.name !== 'RenderingCancelledException'
         ) {
-          console.error(error)
+          setIsError(true)
         }
       } finally {
         if (!cancelled) setIsLoading(false)
@@ -149,13 +152,23 @@ export default function Page() {
             />
 
             {isLoading && (
-              <div className='bg-background absolute inset-0 flex items-center justify-center'>
+              <div className='bg-background/80 absolute inset-0 flex items-center justify-center backdrop-blur-sm'>
                 <div className='flex items-center gap-2'>
                   <Spinner />
                   <span className='text-muted-foreground text-sm'>
                     Preparing page…
                   </span>
                 </div>
+              </div>
+            )}
+
+            {isError && (
+              <div className='bg-background/95 absolute inset-0 flex items-center justify-center p-6'>
+                <Alert variant='destructive' className='max-w-md'>
+                  <CircleAlert />
+                  <AlertTitle>Couldn&apos;t open this PDF</AlertTitle>
+                  <AlertDescription>Please try another file.</AlertDescription>
+                </Alert>
               </div>
             )}
           </section>
