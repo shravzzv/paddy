@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { ChevronLeft, ChevronRight, CircleAlert } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CircleAlert, X } from 'lucide-react'
 import { type RenderTask } from 'pdfjs-dist'
 import { useEffect, useRef, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -115,29 +115,19 @@ export default function Page() {
 
   return (
     <main className='flex h-dvh flex-col'>
-      <header className='flex shrink-0 items-center justify-between gap-4 border-b px-6 py-4'>
+      <header className='flex shrink-0 items-center justify-between border-b px-6 py-4'>
         <h1 className='text-lg font-semibold'>Paddy</h1>
 
-        <Field className='w-auto'>
-          <FieldLabel htmlFor='pdf' className='sr-only'>
-            Open PDF
-          </FieldLabel>
-
-          <Input
-            id='pdf'
-            type='file'
-            accept='.pdf'
-            onChange={(e) => {
-              setFile(e.target.files?.[0] ?? null)
-              setPageNumber(1)
-            }}
-            className='shadow'
-          />
-
-          <FieldDescription className='sr-only'>
-            Select a PDF file to read.
-          </FieldDescription>
-        </Field>
+        {file && (
+          <Button
+            size='icon'
+            variant='ghost'
+            onClick={() => setFile(null)}
+            aria-label='Close document'
+          >
+            <X />
+          </Button>
+        )}
       </header>
 
       {file ? (
@@ -195,10 +185,41 @@ export default function Page() {
           </footer>
         </>
       ) : (
-        <section className='flex flex-1 items-center justify-center'>
-          <p className='text-muted-foreground text-sm'>
-            Open a PDF to start reading.
-          </p>
+        <section className='flex flex-1 items-center justify-center px-6'>
+          <div className='flex max-w-md flex-col items-center text-center'>
+            <h2 className='text-3xl font-semibold tracking-tight'>
+              Read beautifully.
+            </h2>
+
+            <p className='text-muted-foreground mt-3 max-w-sm'>
+              Open a PDF and settle into a comfortable reading experience.
+            </p>
+
+            <Field className='mt-8 w-auto'>
+              <FieldLabel htmlFor='pdf' className='sr-only'>
+                Open PDF
+              </FieldLabel>
+
+              <Input
+                id='pdf'
+                type='file'
+                accept='.pdf'
+                onChange={(e) => {
+                  setFile(e.target.files?.[0] ?? null)
+                  setPageNumber(1)
+                }}
+                className='sr-only'
+              />
+
+              <Button asChild className='cursor-pointer'>
+                <label htmlFor='pdf'>Open a PDF</label>
+              </Button>
+
+              <FieldDescription className='sr-only'>
+                Select a PDF file to read.
+              </FieldDescription>
+            </Field>
+          </div>
         </section>
       )}
     </main>
