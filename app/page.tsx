@@ -114,99 +114,9 @@ export default function Page() {
     }
   }, [file, pageNumber])
 
-  return (
-    <main className='flex h-dvh flex-col overflow-hidden'>
-      {file && (
-        <header className='flex shrink-0 items-center justify-between border-b px-6 py-4'>
-          <h1 className='text-lg font-semibold'>Paddy</h1>
-
-          <Button
-            size='icon'
-            variant='ghost'
-            onClick={() => {
-              setFile(null)
-              setPageCount(0)
-              setPageNumber(1)
-            }}
-            aria-label='Close document'
-          >
-            <X />
-          </Button>
-        </header>
-      )}
-
-      {file ? (
-        <motion.div
-          key='reader'
-          className='flex min-h-0 flex-1 flex-col'
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <section
-            ref={readerRef}
-            className='relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-6'
-          >
-            <canvas
-              ref={canvasRef}
-              className='max-h-full max-w-full rounded-xl shadow-xl'
-            />
-
-            {isLoading && (
-              <motion.div
-                className='bg-background absolute inset-0 flex items-center justify-center'
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.15 }}
-              >
-                <PdfPageSkeleton />
-              </motion.div>
-            )}
-
-            {isError && (
-              <motion.div
-                className='bg-background absolute inset-0 flex items-center justify-center p-6'
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Alert variant='destructive' className='max-w-md'>
-                  <CircleAlert />
-                  <AlertTitle>Couldn&apos;t open this PDF</AlertTitle>
-                  <AlertDescription>Please try another file.</AlertDescription>
-                </Alert>
-              </motion.div>
-            )}
-          </section>
-
-          <footer className='flex shrink-0 items-center justify-center gap-4 border-t px-6 py-4'>
-            <Button
-              size='icon'
-              variant='outline'
-              onClick={goToPrevPage}
-              disabled={pageNumber === 1}
-              aria-label='Previous page'
-            >
-              <ChevronLeft />
-            </Button>
-
-            <span className='min-w-16 text-center text-sm tabular-nums'>
-              {pageNumber} / {pageCount}
-            </span>
-
-            <Button
-              size='icon'
-              variant='outline'
-              onClick={goToNextPage}
-              disabled={pageNumber === pageCount}
-              aria-label='Next page'
-            >
-              <ChevronRight />
-            </Button>
-          </footer>
-        </motion.div>
-      ) : (
+  if (!file)
+    return (
+      <main className='flex h-dvh flex-col overflow-hidden'>
         <motion.section
           key='welcome'
           className='flex flex-1 items-center justify-center px-6'
@@ -250,7 +160,98 @@ export default function Page() {
             </Field>
           </div>
         </motion.section>
-      )}
+      </main>
+    )
+
+  return (
+    <main className='flex h-dvh flex-col overflow-hidden'>
+      <header className='flex shrink-0 items-center justify-between border-b px-6 py-4'>
+        <h1 className='text-lg font-semibold'>Paddy</h1>
+
+        <Button
+          size='icon'
+          variant='ghost'
+          onClick={() => {
+            setFile(null)
+            setPageCount(0)
+            setPageNumber(1)
+          }}
+          aria-label='Close document'
+        >
+          <X />
+        </Button>
+      </header>
+
+      <motion.div
+        key='reader'
+        className='flex min-h-0 flex-1 flex-col'
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        <section
+          ref={readerRef}
+          className='relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-6'
+        >
+          <canvas
+            ref={canvasRef}
+            className='max-h-full max-w-full rounded-xl shadow-xl'
+          />
+
+          {isLoading && (
+            <motion.div
+              className='bg-background absolute inset-0 flex items-center justify-center'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15 }}
+            >
+              <PdfPageSkeleton />
+            </motion.div>
+          )}
+
+          {isError && (
+            <motion.div
+              className='bg-background absolute inset-0 flex items-center justify-center p-6'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Alert variant='destructive' className='max-w-md'>
+                <CircleAlert />
+                <AlertTitle>Couldn&apos;t open this PDF</AlertTitle>
+                <AlertDescription>Please try another file.</AlertDescription>
+              </Alert>
+            </motion.div>
+          )}
+        </section>
+
+        <footer className='flex shrink-0 items-center justify-center gap-4 border-t px-6 py-4'>
+          <Button
+            size='icon'
+            variant='outline'
+            onClick={goToPrevPage}
+            disabled={pageNumber === 1}
+            aria-label='Previous page'
+          >
+            <ChevronLeft />
+          </Button>
+
+          <span className='min-w-16 text-center text-sm tabular-nums'>
+            {pageNumber} / {pageCount}
+          </span>
+
+          <Button
+            size='icon'
+            variant='outline'
+            onClick={goToNextPage}
+            disabled={pageNumber === pageCount}
+            aria-label='Next page'
+          >
+            <ChevronRight />
+          </Button>
+        </footer>
+      </motion.div>
     </main>
   )
 }
