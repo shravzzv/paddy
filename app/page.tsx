@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { type RenderTask } from 'pdfjs-dist'
 import { useEffect, useRef, useState } from 'react'
 
 const MAX_PAGE_WIDTH = 900
@@ -27,6 +28,9 @@ export default function Page() {
   useEffect(() => {
     if (!file) return
 
+    let renderTask: RenderTask | undefined
+    let cancelled = false
+
     const loadPdf = async () => {
       const pdfjs = await import('pdfjs-dist')
 
@@ -39,9 +43,12 @@ export default function Page() {
       const loadingPdf = pdfjs.getDocument({ data: arrayBuffer })
       const pdf = await loadingPdf.promise
 
-      setPageCount(pdf.numPages)
+      if (cancelled) return
 
+      setPageCount(pdf.numPages)
       const page = await pdf.getPage(pageNumber)
+
+      if (cancelled) return
 
       const reader = readerRef.current
       const canvas = canvasRef.current
@@ -59,7 +66,9 @@ export default function Page() {
         availableHeight / naturalPageHeight,
         Math.min(MAX_PAGE_WIDTH, availableWidth) / naturalPageWidth,
       )
-      const scaledPageViewport = page.getViewport({ scale: adaptiveScale })
+      const scaledPageViewport = page.getViewport({
+        scale: adaptiveScale,
+      })
       const scaledPageWidth = scaledPageViewport.width
       const scaledPageHeight = scaledPageViewport.height
 
@@ -69,14 +78,25 @@ export default function Page() {
       const context = canvas.getContext('2d')
       if (!context) return
 
-      await page.render({
+      renderTask = page.render({
         canvasContext: context,
         viewport: scaledPageViewport,
         canvas,
-      }).promise
+      })
+
+      await renderTask.promise
     }
 
-    loadPdf()
+    loadPdf().catch((error) => {
+      if (error?.name !== 'RenderingCancelledException') {
+        console.error(error)
+      }
+    })
+
+    return () => {
+      cancelled = true
+      renderTask?.cancel()
+    }
   }, [file, pageNumber])
 
   return (
