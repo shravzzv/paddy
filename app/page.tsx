@@ -3,11 +3,11 @@
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Spinner } from '@/components/ui/spinner'
 import { ChevronLeft, ChevronRight, CircleAlert } from 'lucide-react'
 import { type RenderTask } from 'pdfjs-dist'
 import { useEffect, useRef, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import PdfPageSkeleton from '@/components/skeletons/pdf-page-skeleton'
 
 const MAX_PAGE_WIDTH = 900
 
@@ -152,18 +152,13 @@ export default function Page() {
             />
 
             {isLoading && (
-              <div className='bg-background/80 absolute inset-0 flex items-center justify-center backdrop-blur-sm'>
-                <div className='flex items-center gap-2'>
-                  <Spinner />
-                  <span className='text-muted-foreground text-sm'>
-                    Preparing page…
-                  </span>
-                </div>
+              <div className='bg-background absolute inset-0 flex items-center justify-center'>
+                <PdfPageSkeleton />
               </div>
             )}
 
             {isError && (
-              <div className='bg-background/95 absolute inset-0 flex items-center justify-center p-6'>
+              <div className='bg-background absolute inset-0 flex items-center justify-center p-6'>
                 <Alert variant='destructive' className='max-w-md'>
                   <CircleAlert />
                   <AlertTitle>Couldn&apos;t open this PDF</AlertTitle>
