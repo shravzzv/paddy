@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { type RenderTask } from 'pdfjs-dist'
 import { useEffect, useRef, useState } from 'react'
@@ -10,9 +11,10 @@ import { useEffect, useRef, useState } from 'react'
 const MAX_PAGE_WIDTH = 900
 
 export default function Page() {
-  const [file, setFile] = useState<File | null>(null)
-  const [pageNumber, setPageNumber] = useState(1)
   const [pageCount, setPageCount] = useState(0)
+  const [pageNumber, setPageNumber] = useState(1)
+  const [isLoading, setIsLoading] = useState(false)
+  const [file, setFile] = useState<File | null>(null)
 
   const readerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -32,66 +34,75 @@ export default function Page() {
     let cancelled = false
 
     const loadPdf = async () => {
-      const pdfjs = await import('pdfjs-dist')
+      setIsLoading(true)
 
-      pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-        'pdfjs-dist/build/pdf.worker.mjs',
-        import.meta.url,
-      ).toString()
+      try {
+        const pdfjs = await import('pdfjs-dist')
 
-      const arrayBuffer = await file.arrayBuffer()
-      const loadingPdf = pdfjs.getDocument({ data: arrayBuffer })
-      const pdf = await loadingPdf.promise
+        pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+          'pdfjs-dist/build/pdf.worker.mjs',
+          import.meta.url,
+        ).toString()
 
-      if (cancelled) return
+        const arrayBuffer = await file.arrayBuffer()
+        const loadingPdf = pdfjs.getDocument({ data: arrayBuffer })
+        const pdf = await loadingPdf.promise
 
-      setPageCount(pdf.numPages)
-      const page = await pdf.getPage(pageNumber)
+        if (cancelled) return
 
-      if (cancelled) return
+        setPageCount(pdf.numPages)
+        const page = await pdf.getPage(pageNumber)
 
-      const reader = readerRef.current
-      const canvas = canvasRef.current
+        if (cancelled) return
 
-      if (!reader || !canvas) return
+        const reader = readerRef.current
+        const canvas = canvasRef.current
 
-      const naturalPageViewport = page.getViewport({ scale: 1 })
-      const naturalPageWidth = naturalPageViewport.width
-      const naturalPageHeight = naturalPageViewport.height
+        if (!reader || !canvas) return
 
-      const availableWidth = reader.clientWidth
-      const availableHeight = reader.clientHeight
+        const naturalPageViewport = page.getViewport({ scale: 1 })
+        const naturalPageWidth = naturalPageViewport.width
+        const naturalPageHeight = naturalPageViewport.height
 
-      const adaptiveScale = Math.min(
-        availableHeight / naturalPageHeight,
-        Math.min(MAX_PAGE_WIDTH, availableWidth) / naturalPageWidth,
-      )
-      const scaledPageViewport = page.getViewport({
-        scale: adaptiveScale,
-      })
-      const scaledPageWidth = scaledPageViewport.width
-      const scaledPageHeight = scaledPageViewport.height
+        const availableWidth = reader.clientWidth
+        const availableHeight = reader.clientHeight
 
-      canvas.width = scaledPageWidth
-      canvas.height = scaledPageHeight
+        const adaptiveScale = Math.min(
+          availableHeight / naturalPageHeight,
+          Math.min(MAX_PAGE_WIDTH, availableWidth) / naturalPageWidth,
+        )
+        const scaledPageViewport = page.getViewport({
+          scale: adaptiveScale,
+        })
+        const scaledPageWidth = scaledPageViewport.width
+        const scaledPageHeight = scaledPageViewport.height
 
-      const context = canvas.getContext('2d')
-      if (!context) return
+        canvas.width = scaledPageWidth
+        canvas.height = scaledPageHeight
 
-      renderTask = page.render({
-        canvasContext: context,
-        viewport: scaledPageViewport,
-        canvas,
-      })
+        const context = canvas.getContext('2d')
+        if (!context) return
 
-      await renderTask.promise
+        renderTask = page.render({
+          canvasContext: context,
+          viewport: scaledPageViewport,
+          canvas,
+        })
+
+        await renderTask.promise
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error?.name !== 'RenderingCancelledException'
+        ) {
+          console.error(error)
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false)
+      }
     }
 
-    loadPdf().catch((error) => {
-      if (error?.name !== 'RenderingCancelledException') {
-        console.error(error)
-      }
-    })
+    loadPdf()
 
     return () => {
       cancelled = true
@@ -130,12 +141,23 @@ export default function Page() {
         <>
           <section
             ref={readerRef}
-            className='flex min-h-0 flex-1 items-center justify-center overflow-hidden p-6'
+            className='relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-6'
           >
             <canvas
               ref={canvasRef}
               className='max-h-full max-w-full rounded-xl shadow-xl'
             />
+
+            {isLoading && (
+              <div className='bg-background absolute inset-0 flex items-center justify-center'>
+                <div className='flex items-center gap-2'>
+                  <Spinner />
+                  <span className='text-muted-foreground text-sm'>
+                    Preparing page…
+                  </span>
+                </div>
+              </div>
+            )}
           </section>
 
           <footer className='flex shrink-0 items-center justify-center gap-4 border-t px-6 py-4'>
