@@ -15,6 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { useTheme } from 'next-themes'
 
 const MAX_PAGE_WIDTH = 900
 
@@ -27,6 +28,8 @@ export default function Page() {
 
   const readerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  const { resolvedTheme } = useTheme()
 
   const goToNextPage = () => {
     setPageNumber((prev) => Math.min(prev + 1, pageCount))
@@ -97,6 +100,10 @@ export default function Page() {
           canvasContext: context,
           viewport: scaledPageViewport,
           canvas,
+          pageColors: {
+            background: resolvedTheme === 'light' ? 'white' : 'black',
+            foreground: resolvedTheme === 'light' ? 'black' : 'white',
+          },
         })
 
         await renderTask.promise
@@ -118,7 +125,7 @@ export default function Page() {
       cancelled = true
       renderTask?.cancel()
     }
-  }, [file, pageNumber])
+  }, [file, pageNumber, resolvedTheme])
 
   if (!file)
     return (
@@ -199,14 +206,7 @@ export default function Page() {
         </div>
       </header>
 
-      <motion.div
-        key='reader'
-        className='flex min-h-0 flex-1 flex-col'
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-      >
+      <motion.div key='reader' className='flex min-h-0 flex-1 flex-col'>
         <section
           ref={readerRef}
           className='relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-6'
@@ -217,14 +217,9 @@ export default function Page() {
           />
 
           {isLoading && (
-            <motion.div
-              className='bg-background absolute inset-0 flex items-center justify-center'
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.15 }}
-            >
+            <div className='bg-background absolute inset-0 flex items-center justify-center'>
               <PdfPageSkeleton />
-            </motion.div>
+            </div>
           )}
 
           {isError && (
