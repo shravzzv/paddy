@@ -101,8 +101,8 @@ export default function Page() {
           viewport: scaledPageViewport,
           canvas,
           pageColors: {
-            background: resolvedTheme === 'light' ? 'white' : 'black',
-            foreground: resolvedTheme === 'light' ? 'black' : 'white',
+            background: resolvedTheme === 'light' ? 'white' : '#181818',
+            foreground: resolvedTheme === 'light' ? '#181818' : 'white',
           },
         })
 
