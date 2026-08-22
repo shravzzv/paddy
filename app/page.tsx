@@ -9,6 +9,13 @@ import { useEffect, useRef, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import PdfPageSkeleton from '@/components/skeletons/pdf-page-skeleton'
 import { motion } from 'motion/react'
+import { ThemeToggle } from '@/components/theme-toggle'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { useTheme } from 'next-themes'
 
 const MAX_PAGE_WIDTH = 900
 
@@ -21,6 +28,8 @@ export default function Page() {
 
   const readerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  const { resolvedTheme } = useTheme()
 
   const goToNextPage = () => {
     setPageNumber((prev) => Math.min(prev + 1, pageCount))
@@ -75,34 +84,56 @@ export default function Page() {
           availableHeight / naturalPageHeight,
           Math.min(MAX_PAGE_WIDTH, availableWidth) / naturalPageWidth,
         )
+
         const scaledPageViewport = page.getViewport({
           scale: adaptiveScale,
         })
+
         const scaledPageWidth = scaledPageViewport.width
         const scaledPageHeight = scaledPageViewport.height
 
+        // Render the new page into an off-screen canvas first.
+        const nextCanvas = document.createElement('canvas')
+        nextCanvas.width = scaledPageWidth
+        nextCanvas.height = scaledPageHeight
+
+        const nextContext = nextCanvas.getContext('2d')
+        if (!nextContext) return
+
+        renderTask = page.render({
+          canvasContext: nextContext,
+          viewport: scaledPageViewport,
+          canvas: nextCanvas,
+          pageColors: {
+            background: resolvedTheme === 'light' ? 'white' : '#181818',
+            foreground: resolvedTheme === 'light' ? '#181818' : 'white',
+          },
+        })
+
+        await renderTask.promise
+
+        // Don't swap in a page if this render has become obsolete.
+        if (cancelled) return
+
+        // The new page is completely rendered, so now update the visible canvas.
         canvas.width = scaledPageWidth
         canvas.height = scaledPageHeight
 
         const context = canvas.getContext('2d')
         if (!context) return
 
-        renderTask = page.render({
-          canvasContext: context,
-          viewport: scaledPageViewport,
-          canvas,
-        })
-
-        await renderTask.promise
+        context.drawImage(nextCanvas, 0, 0)
       } catch (error) {
         if (
           error instanceof Error &&
-          error?.name !== 'RenderingCancelledException'
+          error.name !== 'RenderingCancelledException'
         ) {
           setIsError(true)
         }
       } finally {
-        if (!cancelled) setIsLoading(false)
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
     }
 
@@ -112,7 +143,7 @@ export default function Page() {
       cancelled = true
       renderTask?.cancel()
     }
-  }, [file, pageNumber])
+  }, [file, pageNumber, resolvedTheme])
 
   if (!file)
     return (
@@ -168,28 +199,32 @@ export default function Page() {
       <header className='flex shrink-0 items-center justify-between border-b px-6 py-4'>
         <h1 className='text-lg font-semibold'>Paddy</h1>
 
-        <Button
-          size='icon'
-          variant='ghost'
-          onClick={() => {
-            setFile(null)
-            setPageCount(0)
-            setPageNumber(1)
-          }}
-          aria-label='Close document'
-        >
-          <X />
-        </Button>
+        <div className='flex items-center gap-2'>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size='icon'
+                variant='ghost'
+                onClick={() => {
+                  setFile(null)
+                  setPageCount(0)
+                  setPageNumber(1)
+                }}
+                aria-label='Close PDF'
+              >
+                <X />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Close PDF</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <ThemeToggle />
+        </div>
       </header>
 
-      <motion.div
-        key='reader'
-        className='flex min-h-0 flex-1 flex-col'
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-      >
+      <motion.div key='reader' className='flex min-h-0 flex-1 flex-col'>
         <section
           ref={readerRef}
           className='relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-6'
@@ -200,14 +235,9 @@ export default function Page() {
           />
 
           {isLoading && (
-            <motion.div
-              className='bg-background absolute inset-0 flex items-center justify-center'
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.15 }}
-            >
+            <div className='bg-background absolute inset-0 flex items-center justify-center'>
               <PdfPageSkeleton />
-            </motion.div>
+            </div>
           )}
 
           {isError && (
