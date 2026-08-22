@@ -10,6 +10,11 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import PdfPageSkeleton from '@/components/skeletons/pdf-page-skeleton'
 import { motion } from 'motion/react'
 import { ThemeToggle } from '@/components/theme-toggle'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 const MAX_PAGE_WIDTH = 900
 
@@ -170,18 +175,25 @@ export default function Page() {
         <h1 className='text-lg font-semibold'>Paddy</h1>
 
         <div className='flex items-center gap-2'>
-          <Button
-            size='icon'
-            variant='ghost'
-            onClick={() => {
-              setFile(null)
-              setPageCount(0)
-              setPageNumber(1)
-            }}
-            aria-label='Close document'
-          >
-            <X />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size='icon'
+                variant='ghost'
+                onClick={() => {
+                  setFile(null)
+                  setPageCount(0)
+                  setPageNumber(1)
+                }}
+                aria-label='Close PDF'
+              >
+                <X />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Close PDF</p>
+            </TooltipContent>
+          </Tooltip>
 
           <ThemeToggle />
         </div>
