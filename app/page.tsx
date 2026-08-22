@@ -84,22 +84,26 @@ export default function Page() {
           availableHeight / naturalPageHeight,
           Math.min(MAX_PAGE_WIDTH, availableWidth) / naturalPageWidth,
         )
+
         const scaledPageViewport = page.getViewport({
           scale: adaptiveScale,
         })
+
         const scaledPageWidth = scaledPageViewport.width
         const scaledPageHeight = scaledPageViewport.height
 
-        canvas.width = scaledPageWidth
-        canvas.height = scaledPageHeight
+        // Render the new page into an off-screen canvas first.
+        const nextCanvas = document.createElement('canvas')
+        nextCanvas.width = scaledPageWidth
+        nextCanvas.height = scaledPageHeight
 
-        const context = canvas.getContext('2d')
-        if (!context) return
+        const nextContext = nextCanvas.getContext('2d')
+        if (!nextContext) return
 
         renderTask = page.render({
-          canvasContext: context,
+          canvasContext: nextContext,
           viewport: scaledPageViewport,
-          canvas,
+          canvas: nextCanvas,
           pageColors: {
             background: resolvedTheme === 'light' ? 'white' : '#181818',
             foreground: resolvedTheme === 'light' ? '#181818' : 'white',
@@ -107,15 +111,29 @@ export default function Page() {
         })
 
         await renderTask.promise
+
+        // Don't swap in a page if this render has become obsolete.
+        if (cancelled) return
+
+        // The new page is completely rendered, so now update the visible canvas.
+        canvas.width = scaledPageWidth
+        canvas.height = scaledPageHeight
+
+        const context = canvas.getContext('2d')
+        if (!context) return
+
+        context.drawImage(nextCanvas, 0, 0)
       } catch (error) {
         if (
           error instanceof Error &&
-          error?.name !== 'RenderingCancelledException'
+          error.name !== 'RenderingCancelledException'
         ) {
           setIsError(true)
         }
       } finally {
-        if (!cancelled) setIsLoading(false)
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
     }
 
