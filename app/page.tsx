@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import PdfPageSkeleton from '@/components/skeletons/pdf-page-skeleton'
 import { motion } from 'motion/react'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const MAX_PAGE_WIDTH = 900
 
@@ -168,18 +169,22 @@ export default function Page() {
       <header className='flex shrink-0 items-center justify-between border-b px-6 py-4'>
         <h1 className='text-lg font-semibold'>Paddy</h1>
 
-        <Button
-          size='icon'
-          variant='ghost'
-          onClick={() => {
-            setFile(null)
-            setPageCount(0)
-            setPageNumber(1)
-          }}
-          aria-label='Close document'
-        >
-          <X />
-        </Button>
+        <div className='flex items-center gap-2'>
+          <Button
+            size='icon'
+            variant='ghost'
+            onClick={() => {
+              setFile(null)
+              setPageCount(0)
+              setPageNumber(1)
+            }}
+            aria-label='Close document'
+          >
+            <X />
+          </Button>
+
+          <ThemeToggle />
+        </div>
       </header>
 
       <motion.div
